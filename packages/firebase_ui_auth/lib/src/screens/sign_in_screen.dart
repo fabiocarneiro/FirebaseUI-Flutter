@@ -101,6 +101,17 @@ class SignInScreen extends MultiProviderScreen {
   /// {@macro ui.auth.screens.responsive_page.max_width}
   final double? maxWidth;
 
+  /// A spacing between authentication related widgets.
+  ///
+  /// Defaults to 8.0.
+  final double? itemSpacing;
+
+  /// A widget that would be placed between the authentication related widgets.
+  ///
+  /// If provided, this widget will be used instead of the default spacing
+  /// for separating providers.
+  final Widget? providerSeparator;
+
   /// {@macro ui.auth.screens.sign_in_screen}
   const SignInScreen({
     super.key,
@@ -122,6 +133,8 @@ class SignInScreen extends MultiProviderScreen {
     this.styles,
     this.showPasswordVisibilityToggle = false,
     this.maxWidth,
+    this.itemSpacing,
+    this.providerSeparator,
   });
 
   @override
@@ -151,6 +164,8 @@ class SignInScreen extends MultiProviderScreen {
         breakpoint: breakpoint,
         showPasswordVisibilityToggle: showPasswordVisibilityToggle,
         maxWidth: maxWidth,
+        itemSpacing: itemSpacing,
+        providerSeparator: providerSeparator,
       ),
     );
   }

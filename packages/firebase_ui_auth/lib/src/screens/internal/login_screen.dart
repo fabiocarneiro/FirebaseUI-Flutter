@@ -57,6 +57,12 @@ class LoginScreen extends StatelessWidget {
   /// {@macro ui.auth.screens.responsive_page.max_width}
   final double? maxWidth;
 
+  /// A spacing between authentication related widgets.
+  final double? itemSpacing;
+
+  /// A widget that would be placed between the authentication related widgets.
+  final Widget? providerSeparator;
+
   const LoginScreen({
     super.key,
     required this.action,
@@ -77,6 +83,8 @@ class LoginScreen extends StatelessWidget {
     this.styles,
     this.showPasswordVisibilityToggle = false,
     this.maxWidth,
+    this.itemSpacing,
+    this.providerSeparator,
   });
 
   @override
@@ -96,6 +104,8 @@ class LoginScreen extends StatelessWidget {
           subtitleBuilder: subtitleBuilder,
           footerBuilder: footerBuilder,
           showPasswordVisibilityToggle: showPasswordVisibilityToggle,
+          itemSpacing: itemSpacing,
+          providerSeparator: providerSeparator,
         ),
       ),
     );

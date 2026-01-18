@@ -78,3 +78,4 @@ firebase-debug.log
 firestore-debug.log
 database-debug.log
 ui-debug.log
+conductor/
