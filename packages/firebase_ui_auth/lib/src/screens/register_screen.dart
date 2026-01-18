@@ -93,16 +93,11 @@ class RegisterScreen extends MultiProviderScreen {
   /// {@macro ui.auth.screens.responsive_page.max_width}
   final double? maxWidth;
 
-  /// A spacing between authentication related widgets.
+  /// A builder that allows to customize the order and appearance of the providers.
   ///
-  /// Defaults to 8.0.
-  final double? itemSpacing;
-
-  /// A widget that would be placed between the authentication related widgets.
-  ///
-  /// If provided, this widget will be used instead of the default spacing
-  /// for separating providers.
-  final Widget? providerSeparator;
+  /// If not provided, the default explicit order is used:
+  /// Email, Phone, Email Link, OAuth.
+  final ProvidersBuilder? providersBuilder;
 
   const RegisterScreen({
     super.key,
@@ -123,8 +118,7 @@ class RegisterScreen extends MultiProviderScreen {
     this.styles,
     this.showPasswordVisibilityToggle = false,
     this.maxWidth,
-    this.itemSpacing,
-    this.providerSeparator,
+    this.providersBuilder,
   });
 
   @override
@@ -149,8 +143,7 @@ class RegisterScreen extends MultiProviderScreen {
         breakpoint: breakpoint,
         showPasswordVisibilityToggle: showPasswordVisibilityToggle,
         maxWidth: maxWidth,
-        itemSpacing: itemSpacing,
-        providerSeparator: providerSeparator,
+        providersBuilder: providersBuilder,
       ),
     );
   }

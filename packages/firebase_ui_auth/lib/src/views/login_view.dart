@@ -18,6 +18,12 @@ typedef AuthViewContentBuilder = Widget Function(
   AuthAction action,
 );
 
+typedef ProvidersBuilder = List<Widget> Function(
+  BuildContext context,
+  List<AuthProvider> providers,
+  AuthAction action,
+);
+
 /// {@template ui.auth.views.login_view}
 /// A view that could be used to build a custom [SignInScreen] or
 /// [RegisterScreen].
@@ -58,16 +64,11 @@ class LoginView extends StatefulWidget {
   /// {@macro ui.auth.widgets.email_from.showPasswordVisibilityToggle}
   final bool showPasswordVisibilityToggle;
 
-  /// A spacing between authentication related widgets.
+  /// A builder that allows to customize the order and appearance of the providers.
   ///
-  /// Defaults to 8.0.
-  final double? itemSpacing;
-
-  /// A widget that would be placed between the authentication related widgets.
-  ///
-  /// If provided, this widget will be used instead of the default spacing
-  /// for separating providers.
-  final Widget? providerSeparator;
+  /// If not provided, the default explicit order is used:
+  /// Email, Phone, Email Link, OAuth.
+  final ProvidersBuilder? providersBuilder;
 
   /// {@macro ui.auth.views.login_view}
   const LoginView({
@@ -83,8 +84,7 @@ class LoginView extends StatefulWidget {
     this.subtitleBuilder,
     this.actionButtonLabelOverride,
     this.showPasswordVisibilityToggle = false,
-    this.itemSpacing,
-    this.providerSeparator,
+    this.providersBuilder,
   });
 
   @override
@@ -247,6 +247,42 @@ class _LoginViewState extends State<LoginView> {
     return null;
   }
 
+  List<Widget> _defaultProvidersBuilder(
+    BuildContext context,
+    List<AuthProvider> providers,
+    AuthAction action,
+  ) {
+    final platform = Theme.of(context).platform;
+    final children = <Widget>[];
+
+    void addForType<T>() {
+      for (var provider in providers) {
+        if (provider is T && provider.supportsPlatform(platform)) {
+          final w = _buildProviderWidget(platform, provider);
+
+          if (w != null) {
+            if (provider is OAuthProvider) {
+              children.add(w);
+            } else {
+              children.add(const SizedBox(height: 8));
+              children.add(w);
+              if (provider is PhoneAuthProvider) {
+                children.add(const SizedBox(height: 8));
+              }
+            }
+          }
+        }
+      }
+    }
+
+    addForType<EmailAuthProvider>();
+    addForType<PhoneAuthProvider>();
+    addForType<EmailLinkAuthProvider>();
+    addForType<OAuthProvider>();
+
+    return children;
+  }
+
   @override
   Widget build(BuildContext context) {
     final platform = Theme.of(context).platform;
@@ -256,43 +292,8 @@ class _LoginViewState extends State<LoginView> {
       if (_showTitle) ..._buildHeader(context),
     ];
 
-    if (widget.itemSpacing != null || widget.providerSeparator != null) {
-      final providerWidgets = <Widget>[];
-      for (var provider in widget.providers) {
-        if (!provider.supportsPlatform(platform)) continue;
-        final w = _buildProviderWidget(platform, provider);
-        if (w != null) providerWidgets.add(w);
-      }
-
-      for (var i = 0; i < providerWidgets.length; i++) {
-        if (i > 0) {
-          children.add(
-            widget.providerSeparator ??
-                SizedBox(height: widget.itemSpacing ?? 8),
-          );
-        } else {
-          children.add(SizedBox(height: widget.itemSpacing ?? 8));
-        }
-        children.add(providerWidgets[i]);
-      }
-    } else {
-      for (var provider in widget.providers) {
-        if (!provider.supportsPlatform(platform)) continue;
-        final w = _buildProviderWidget(platform, provider);
-
-        if (w != null) {
-          if (provider is OAuthProvider) {
-            children.add(w);
-          } else {
-            children.add(const SizedBox(height: 8));
-            children.add(w);
-            if (provider is PhoneAuthProvider) {
-              children.add(const SizedBox(height: 8));
-            }
-          }
-        }
-      }
-    }
+    final builder = widget.providersBuilder ?? _defaultProvidersBuilder;
+    children.addAll(builder(context, widget.providers, _action));
 
     if (widget.footerBuilder != null) {
       children.add(widget.footerBuilder!(context, _action));
